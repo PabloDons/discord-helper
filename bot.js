@@ -4,6 +4,7 @@ const fs        = require('fs');
 const auth      = require('./auth.json');
 const config    = require('./config.json');
 const perms     = require('./permissions.json');
+const path      = require('path');
 
 var commands = {
     "ping": {
@@ -22,27 +23,6 @@ var commands = {
 	}
 };
 
-//// Loading plugins
-function getDirectories(srcpath) {
-    return fs.readdirSync(srcpath).filter(function(file) {
-        return fs.statSync(path.join(srcpath, file)).isDirectory();
-    });
-}
-
-const plugin_directory = "./plugins/";
-const plugin_folders = getDirectories(plugin_directory);
-for (let i = 0; i < plugin_folders.length; i++) {
-    let modpack = require(plugin_directory+plugin_folders[i]+'/package.json');
-    let plugin = require(plugin_directory+plugin_folders[i]+'/'+modpack.main);
-    for (let i = 0; i < plugin.commands.length; i++) {
-        if (commands.hasOwnProperty(plugin.commands[i])) {
-            console.err('Error: Command conflict: '+plugin.commands[i] +
-                '\nCould not load plugin \''+plugin_folders[i]+'\'');
-        }
-        commands[plugin.commands[i]] = plugin[plugin.commands[i]];
-    }
-}
-
 function onExit() {
     console.log("exiting...");
     bot.destroy().then(process.exit());
@@ -50,6 +30,12 @@ function onExit() {
 process.on('SIGINT', onExit);
 process.on('SIGTERM', onExit);
 
+
+function getDirectories(srcpath) {
+    return fs.readdirSync(srcpath).filter(function(file) {
+        return fs.statSync(path.join(srcpath, file)).isDirectory();
+    });
+}
 
 //// Discord bot
 var bot = new Discord.Client();
@@ -79,4 +65,26 @@ bot.on('message', (msg) => {
 });
 
 console.log('Authenticating with discord...');
-bot.login(auth.token).then((s) => console.log("Authenticated!"));
+bot.login(auth.token).then((s) => {
+    console.log("Authenticated!");
+    console.log("Loading plugins...");
+
+    //// loading plugins
+    const plugin_directory = "./plugins/";
+    const plugin_folders = getDirectories(plugin_directory);
+    for (let i = 0; i < plugin_folders.length; i++) {
+        let modpack = require(plugin_directory+plugin_folders[i]+'/package.json');
+        let plugin = require(plugin_directory+plugin_folders[i]+'/'+modpack.main);
+        for (let i = 0; i < plugin.commands.length; i++) {
+            if (commands.hasOwnProperty(plugin.commands[i])) {
+                console.err('Error: Command conflict: '+plugin.commands[i] +
+                    '\nCould not load plugin \''+plugin_folders[i]+'\'');
+            }
+            commands[plugin.commands[i]] = plugin[plugin.commands[i]];
+        }
+        if (plugin._prerun) {
+            plugin._prerun(bot);
+        }
+    }
+    console.log("Done!");
+});

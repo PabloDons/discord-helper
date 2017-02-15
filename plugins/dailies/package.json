@@ -1,16 +1,14 @@
 {
-  "name": "discord-pablo-helper",
+  "name": "dailies",
   "version": "1.0.0",
   "description": "",
-  "main": "bot.js",
+  "main": "dailies.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "PabloDons",
+  "author": "",
   "license": "GPL-3.0",
   "dependencies": {
-    "discord.js": "^11.0.0",
-    "fs": "latest",
-    "path": "^0.12.7"
+    "cron": "^1.2.1"
   }
 }
