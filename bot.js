@@ -9,7 +9,7 @@ const path      = require('path');
 var commands = {
     "ping": {
         process:function(bot, msg, suffix) {
-            msg.channel.sendMessage(suffix || "pong!");
+            msg.channel.sendMessage("pong!");
         }
     },
     "eval": {
@@ -17,7 +17,8 @@ var commands = {
 		description: 'Executes arbitrary javascript in the bot process. User must have "eval" permission',
 		process: function(bot, msg, suffix) {
             console.log("evaluating "+suffix);
-            eval(suffix, bot);
+            var embed = {color:0x00ff00,fields:[{name:"Input code",value:"```javascript\n"+suffix+"\n```"}, {name:"Output", value:"```javascript\n"+eval(suffix, bot)+"\n```"}]};
+            msg.edit("", {embed:embed});
             // --eval msg.edit("",{embed:{author:{name:"Pablo"},thumbnail:{url:"https://i.imgur.com/RDzNF7D.png"},title:"plz ignore",description:"This is a spoopy post"}});
 		}
 	}
