@@ -6,13 +6,7 @@ try{
 	crons = require("./config.json");
 } catch(e){ //no config file, use defaults
 	crons = [];
-	try{
-		if(fs.lstatSync("./config.json").isFile()){
-			console.log("WARNING: config.json found but we couldn't read it!\n" + e.stack);
-		}
-	} catch(e2){
-		fs.writeFile("./config.json", JSON.stringify(crons,null,4));
-	}
+	fs.writeFile("./config.json", JSON.stringify(crons,null,4));
 }
 
 

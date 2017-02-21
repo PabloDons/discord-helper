@@ -13,13 +13,7 @@ try{
             "ping": true
         }
     };
-	try{
-		if(fs.lstatSync("./permisssions.json").isFile()){
-			console.log("WARNING: permisssions.json found but we couldn't read it!\n" + e.stack);
-		}
-	} catch(e2){
-		fs.writeFile("./permisssions.json", JSON.stringify(perms,null,4));
-	}
+	fs.writeFile("./permisssions.json", JSON.stringify(perms,null,4));
 }
 
 var config;
@@ -29,14 +23,8 @@ try{
 	config = {
         commandPrefix: "!",
         debug: false
-    }
-	try{
-		if(fs.lstatSync("./config.json").isFile()){
-			console.log("WARNING: config.json found but we couldn't read it!\n" + e.stack);
-		}
-	} catch(e2){
-		fs.writeFile("./config.json", JSON.stringify(config,null,4));
-	}
+    };
+	fs.writeFile("./config.json", JSON.stringify(config,null,4));
 }
 
 var commands = {
