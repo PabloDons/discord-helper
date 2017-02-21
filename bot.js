@@ -6,14 +6,14 @@ const path      = require('path');
 
 var perms;
 try{
-	perms = require("./permisssions.json");
+	perms = require("./permissions.json");
 } catch(e) { //no permissions file, use defaults
 	perms = {
         "global": {
             "ping": true
         }
     };
-	fs.writeFile("./permisssions.json", JSON.stringify(perms,null,4));
+	fs.writeFile("./permissions.json", JSON.stringify(perms,null,4));
 }
 
 var config;
