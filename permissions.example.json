@@ -1,0 +1,10 @@
+{
+    "global": {
+        "ping": true
+    },
+    "users": {
+        "123123":{
+            "eval": true
+        }
+    }
+}

@@ -1,0 +1,7 @@
+[
+    {
+        "date":"0 0 22 * * *",
+        "channelId":"123123",
+        "text":"hello again!"
+    }
+]

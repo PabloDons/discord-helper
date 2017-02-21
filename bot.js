@@ -2,9 +2,42 @@
 const Discord   = require('discord.js');
 const fs        = require('fs');
 const auth      = require('./auth.json');
-const config    = require('./config.json');
-const perms     = require('./permissions.json');
 const path      = require('path');
+
+var perms;
+try{
+	perms = require("./permisssions.json");
+} catch(e) { //no permissions file, use defaults
+	perms = {
+        "global": {
+            "ping": true
+        }
+    };
+	try{
+		if(fs.lstatSync("./permisssions.json").isFile()){
+			console.log("WARNING: permisssions.json found but we couldn't read it!\n" + e.stack);
+		}
+	} catch(e2){
+		fs.writeFile("./permisssions.json", JSON.stringify(perms,null,4));
+	}
+}
+
+var config;
+try{
+	config = require("./config.json");
+} catch(e) { //no permissions file, use defaults
+	config = {
+        commandPrefix: "!",
+        debug: false
+    }
+	try{
+		if(fs.lstatSync("./config.json").isFile()){
+			console.log("WARNING: config.json found but we couldn't read it!\n" + e.stack);
+		}
+	} catch(e2){
+		fs.writeFile("./config.json", JSON.stringify(config,null,4));
+	}
+}
 
 var commands = {
     "ping": {
@@ -17,9 +50,21 @@ var commands = {
 		description: 'Executes arbitrary javascript in the bot process. User must have "eval" permission',
 		process: function(bot, msg, suffix) {
             console.log("evaluating "+suffix);
-            var embed = {color:0x00ff00,fields:[{name:"Input code",value:"```javascript\n"+suffix+"\n```"}, {name:"Output", value:"```javascript\n"+eval(suffix, bot)+"\n```"}]};
+            var embed = {
+                color:0x00ff00,
+                fields:[
+                    {
+                        name:"Input code",
+                        value:"```javascript\n"+suffix+"\n```"
+                    },
+                    {
+                        name:"Output",
+                        value:"```javascript\n"+eval(suffix)+"\n```"
+                    }
+                ],
+                timestamp: new Date()
+            };
             msg.edit("", {embed:embed});
-            // --eval msg.edit("",{embed:{author:{name:"Pablo"},thumbnail:{url:"https://i.imgur.com/RDzNF7D.png"},title:"plz ignore",description:"This is a spoopy post"}});
 		}
 	}
 };
@@ -45,7 +90,7 @@ bot.on('message', (msg) => {
         console.log("treating "+msg.content+" as command...");
         var command = msg.content.split(" ")[0].substring(config.commandPrefix.length);
         var suffix = msg.content.substr(config.commandPrefix.length+command.length+1);
-        if ((!perms.global.hasOwnProperty(command) || perms.global[command]) || (perms.users[msg.author.id] && perms.users[msg.author.id][command])) {
+        if (msg.author.id == bot.user.id || perms.global[command] || (perms.users.hasOwnProperty(msg.author.id) && perms.users[msg.author.id][command])) {
                 if (commands.hasOwnProperty(command)) {
                     try {
                         commands[command].process(bot, msg, suffix);
@@ -63,6 +108,20 @@ bot.on('message', (msg) => {
             console.log("permission denied");
         }
     }
+});
+
+var chatlogger = {};
+bot.on('message', (msg) => {
+    if (msg.channel.id != chatlogger.channel) {
+        chatlogger.channel = msg.channel.id;
+        chatlogger.author = "";
+        console.log(msg.guild.name+"#"+msg.channel.name);
+    }
+    if (msg.author.id != chatlogger.author) {
+        chatlogger.author = msg.author.id;
+        console.log("    "+msg.author.username);
+    }
+    console.log("        "+msg.content);
 });
 
 console.log('Authenticating with discord...');

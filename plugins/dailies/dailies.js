@@ -2,15 +2,15 @@
 const cron = require('cron').CronJob;
 var crons;
 try{
-	crons = require("./crons.json");
+	crons = require("./config.json");
 } catch(e){ //no config file, use defaults
 	crons = [];
 	try{
-		if(fs.lstatSync("./crons.json").isFile()){
-			console.log("WARNING: crons.json found but we couldn't read it!\n" + e.stack);
+		if(fs.lstatSync("./config.json").isFile()){
+			console.log("WARNING: config.json found but we couldn't read it!\n" + e.stack);
 		}
 	} catch(e2){
-		fs.writeFile("./crons.json", JSON.stringify(crons,null,4));
+		fs.writeFile("./config.json", JSON.stringify(crons,null,4));
 	}
 }
 
@@ -36,9 +36,16 @@ exports.cron = {
             console.log("command failed!");
             return;
         }
-        new cron(args.splice(0, 6).join(" "), function() {
-            msg.channel.sendMessage(args.join(" "));
+		var cron = {
+			date:args.splice(0, 6).join(" "),
+			channelId:msg.channel.id,
+			text:args.join(" ")
+		}
+        new cron(cron.date, function() {
+            msg.channel.sendMessage(cron.text);
         }, null, true);
+		crons.push(cron);
+		fs.writeFile("./config.json", JSON.stringify(crons,null,4));
     }
 };
 
