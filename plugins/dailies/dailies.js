@@ -5,7 +5,7 @@ var crons;
 try{
 	crons = require("./config.json");
 } catch(e){ //no config file, use defaults
-	crons = [];
+	crons = ["test"];
 	fs.writeFile("./config.json", JSON.stringify(crons,null,4));
 }
 

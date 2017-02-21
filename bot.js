@@ -134,5 +134,5 @@ bot.login(auth.token).then((s) => {
             plugin._prerun(bot);
         }
     }
-    console.log("Done!");
+    console.log("Done! use "+config.commandPrefix+"help for a list of commands");
 });
