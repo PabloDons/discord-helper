@@ -1,4 +1,5 @@
-auth.json
 node_modules
+auth.json
+crons.json
 config.json
 permissions.json

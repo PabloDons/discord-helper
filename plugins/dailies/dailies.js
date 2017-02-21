@@ -1,12 +1,12 @@
 /* jshint esversion:6 */
-const cron = require('cron').CronJob;
+const cron = require('node-cron');
 const fs = require('fs');
 var crons;
 try{
-	crons = require("./config.json");
+	crons = require("../../crons.json");
 } catch(e){ //no config file, use defaults
-	crons = ["test"];
-	fs.writeFile("./config.json", JSON.stringify(crons,null,4));
+	crons = [];
+	fs.writeFile("./crons.json", JSON.stringify(crons,null,4));
 }
 
 
@@ -14,9 +14,7 @@ exports._prerun = function(bot) {
     for (var i in crons) {
         var channel = bot.channels.get(crons[i].channelId);
         if (channel) {
-            new cron(crons[i].date, function() {
-                channel.sendMessage(crons[i].text);
-            }, null, true);
+            cron.schedule(crons[i].date, () => channel.sendMessage(crons[i].text));
         } else {
             console.log("cron "+i+" failed: no such channel!");
         }
@@ -28,19 +26,16 @@ exports.cron = {
     process:function(bot, msg, suffix) {
         var args = suffix.split(" ");
         if (args.length<7) {
-            console.log("command failed!");
-            return;
+            throw new Error("Too few arguments");
         }
-		var cron = {
+		var thisCron = {
 			date:args.splice(0, 6).join(" "),
 			channelId:msg.channel.id,
 			text:args.join(" ")
 		};
-        new cron(cron.date, function() {
-            msg.channel.sendMessage(cron.text);
-        }, null, true);
-		crons.push(cron);
-		fs.writeFile("./config.json", JSON.stringify(crons,null,4));
+        cron.schedule(thisCron.date, () => msg.channel.sendMessage(thisCron.text));
+		crons.push(thisCron);
+		fs.writeFile("./crons.json", JSON.stringify(crons,null,4));
     }
 };
 

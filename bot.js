@@ -73,44 +73,50 @@ function getDirectories(srcpath) {
 
 //// Discord bot
 var bot = new Discord.Client();
-bot.on('message', (msg) => {
-    if (msg.content.substring(0, config.commandPrefix.length) == config.commandPrefix) {
-        console.log("treating "+msg.content+" as command...");
-        var command = msg.content.split(" ")[0].substring(config.commandPrefix.length);
-        var suffix = msg.content.substr(config.commandPrefix.length+command.length+1);
-        if (msg.author.id == bot.user.id || perms.global[command] || (perms.users.hasOwnProperty(msg.author.id) && perms.users[msg.author.id][command])) {
-                if (commands.hasOwnProperty(command)) {
-                    try {
-                        commands[command].process(bot, msg, suffix);
-                        console.log("command succeeded");
-                    } catch(e) {
-                        console.log("command "+suffix+" failed");
-                        if(config.debug){
-                            console.log(e.stack);
-                        }
-                    }
-                } else {
-                    console.log("no such command");
-                }
-        } else {
-            console.log("permission denied");
-        }
-    }
-});
 
 var chatlogger = {};
 bot.on('message', (msg) => {
-    if (msg.channel.id != chatlogger.channel) {
-        chatlogger.channel = msg.channel.id;
-        chatlogger.author = "";
-        console.log(msg.guild.name+"#"+msg.channel.name);
-    }
-    if (msg.author.id != chatlogger.author) {
-        chatlogger.author = msg.author.id;
-        console.log("    "+msg.author.username);
-    }
-    console.log("        "+msg.content);
+	if (msg.content.substring(0, config.commandPrefix.length) == config.commandPrefix) {
+		console.log("treating "+msg.content+" as command...");
+		var command = msg.content.split(" ")[0].substring(config.commandPrefix.length);
+		var suffix = msg.content.substr(config.commandPrefix.length+command.length+1);
+		if (msg.author.id == bot.user.id || perms.global[command] || (perms.users.hasOwnProperty(msg.author.id) && perms.users[msg.author.id][command])) {
+			if (commands.hasOwnProperty(command)) {
+				try {
+					commands[command].process(bot, msg, suffix);
+					console.log("command succeeded");
+				} catch(e) {
+					console.log("command "+suffix+" failed");
+					if(config.debug){
+						console.log(e.stack);
+					}
+				}
+			} else {
+				console.log("no such command");
+			}
+		} else {
+			console.log("permission denied");
+		}
+	}
 });
+// bot.on('message', (msg) => {
+// 	if (msg.channel.id != chatlogger.channel) {
+// 		chatlogger.channel = msg.channel.id;
+// 		chatlogger.author = "";
+// 		if (msg.channel.type == "dm") {
+// 			console.log(msg.channel.recipient.username);
+// 		} else if (msg.channel.type == "text") {
+// 			console.log(msg.guild.name+"#"+msg.channel.name);
+// 		} else if (msg.channel.type == "group") {
+// 			console.log(msg.channel.name || msg.channel.recipients.array().toString())
+// 		}
+// 	}
+// 	if (msg.author.id != chatlogger.author) {
+// 		chatlogger.author = msg.author.id;
+// 		console.log("    "+msg.author.username);
+// 	}
+// 	console.log("        "+msg.content);
+// });
 
 console.log('Authenticating with discord...');
 bot.login(auth.token).then((s) => {

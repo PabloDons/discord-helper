@@ -1,6 +1,6 @@
 [
     {
-        "date":"0 0 22 * * *",
+        "date":"59 59 23 * * *",
         "channelId":"123123",
         "text":"hello again!"
     }
