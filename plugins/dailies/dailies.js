@@ -1,5 +1,6 @@
 /* jshint esversion:6 */
 const cron = require('cron').CronJob;
+const fs = require('fs');
 var crons;
 try{
 	crons = require("./config.json");
