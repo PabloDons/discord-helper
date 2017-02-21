@@ -41,7 +41,7 @@ exports.cron = {
 			date:args.splice(0, 6).join(" "),
 			channelId:msg.channel.id,
 			text:args.join(" ")
-		}
+		};
         new cron(cron.date, function() {
             msg.channel.sendMessage(cron.text);
         }, null, true);
