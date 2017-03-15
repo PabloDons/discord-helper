@@ -65,7 +65,7 @@ exports.acceptchess = {
     usage: "",
     describtion: "accept a challenge",
     process: function(bot, msg, suffix) {
-        var game = runningGames.find((el)=>(el.w == msg.author));
+        var game = runningGames.find((el)=>(el.w.id == msg.author.id));
         if (typeof game == 'undefined') {
             msg.channel.sendMessage("You have not been challenged to play any game!");
         } else if (!game.pending) {
