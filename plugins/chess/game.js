@@ -6,7 +6,7 @@ exports.commands = [
 ];
 
 const spawn = require("child_process").spawn;
-const boardgen = spawn('python ./boardimage/server.py');
+const boardgen = spawn('python', ['./boardimage/server.py']);
 boardgen.stdout.on('data', (chunk)=>{
     msg.channel.stopTyping();
     boardgenqueue.shift().sendFile(chunk, "board.png");
