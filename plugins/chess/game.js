@@ -69,7 +69,7 @@ exports.startchess = {
 exports.acceptchess = {
     usage: "",
     describtion: "accept a challenge",
-    process: function(bot, msg, suffix) {
+    process: function(bot, msg, suffix, config) {
         var game = runningGames.find(function(el) {return (el.w.id == msg.author.id);});
         if (typeof game == 'undefined') {
             msg.channel.sendMessage("You have not been challenged to play any game!");
@@ -131,7 +131,7 @@ exports.chess = {
                 type:"png",
                 render:{
                     fen: game.chess.fen().split(" ")[0],
-                    lastMove: args[0]+args[1]
+                    lastMove: move === null ? null : args[0]+args[1]
                 }
             })+"\n", undefined, ()=>{
                 msg.channel.startTyping();
