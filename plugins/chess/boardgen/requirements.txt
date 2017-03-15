@@ -1,0 +1,2 @@
+python-chess==0.17.0
+CairoSVG==2.0.1
