@@ -35,7 +35,7 @@ exports.startchess = {
         var id;
         console.log(suffix);
         if (suffix.length>4) {
-            id = suffix.substring(3,suffix.length-2);
+            id = suffix.substring(3,suffix.length-1);
         } else {
             throw new Error("invalid argument");
         }
