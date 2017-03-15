@@ -32,7 +32,17 @@ exports.startchess = {
     usage: "<challenger>",
     describtion: "challenge a player to a new chess game",
     process: function(msg, suffix, bot, config) {
-        challengee = msg.mentions.users.first();
+        var id;
+        if (suffix.length>4) {
+            id = suffix.substring(3,suffix.length-2);
+        } else {
+            return;
+        }
+        var challengee;
+        if (!(challengee = bot.users.get(id))) {
+            return;
+        }
+
         var game = runningGames.find((el)=>(el.b == msg.author || el.w == challengee));
         if (typeof game == 'undefined') {
             msg.channel.sendMessage("You or your challengee is already in a game in "+game.channel+"! End or finish it first");
