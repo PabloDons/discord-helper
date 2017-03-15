@@ -38,10 +38,7 @@ exports.startchess = {
     process: function(bot, msg, suffix, config) {
         var id;
         if (suffix.length>4) {
-            id = suffix.substring(2,suffix.length-1);
-            if (id[0] == "!") {
-                id = id.substring(1);
-            }
+            id = suffix.substring(3,suffix.length-1);
         } else {
             throw new Error("invalid argument");
         }
@@ -91,7 +88,7 @@ exports.acceptchess = {
             })+"\n", undefined, ()=>{
                 msg.channel.startTyping();
                 boardgenqueue.push(msg.channel);
-                msg.channel.sendMessage(game[game.chess.turn()]+" Your move!\n**usage:** "+config.commandPrefix+"chess "+"<from> <to>");
+                msg.channel.sendMessage(game[game.chess.turn()]+" Your move!);
             });
         }
     }
