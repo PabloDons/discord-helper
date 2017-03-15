@@ -6,7 +6,7 @@ exports.commands = [
 ];
 
 const spawn = require("child_process").spawn;
-const boardgen = spawn('python', ['plugins/chess/boardgen/server.py']);
+const boardgen = spawn('python3', ['plugins/chess/boardgen/server.py']);
 boardgen.stdout.on('data', (chunk)=>{
     var ch = boardgenqueue.shift();
     ch.stopTyping();
