@@ -6,7 +6,7 @@ exports.commands = [
 ];
 
 const spawn = require("child_process").spawn;
-const boardgen = spawn('./boardimage/server.py');
+const boardgen = spawn('python ./boardimage/server.py');
 boardgen.stdout.on('data', (chunk)=>{
     msg.channel.stopTyping();
     boardgenqueue.shift().sendFile(chunk, "board.png");
@@ -65,7 +65,12 @@ exports.acceptchess = {
             bot.clearTimeout(game.timeout);
             msg.channel.sendMessage("Game started between "+game.w+" and "+game.b+"!");
 
-            boardgen.stdin.write(game.fen().split(" ")[0], undefined, ()=>{
+            boardgen.stdin.write(JSON.stringify({
+                type:"png",
+                render:{
+                    fen: game.fen().split(" ")[0]
+                }
+            })+"\n", undefined, ()=>{
                 msg.channel.startTyping();
                 boardgenqueue.append(msg.channel);
                 msg.channel.sendMessage(game.w+" Your move!");
