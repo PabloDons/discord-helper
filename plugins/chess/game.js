@@ -31,8 +31,9 @@ function game(ch, white, black, timeout) {
 exports.startchess = {
     usage: "<challenger>",
     describtion: "challenge a player to a new chess game",
-    process: function(msg, suffix, bot, config) {
+    process: function(bot, msg, suffix, config) {
         var id;
+        console.log(suffix);
         if (suffix.length>4) {
             id = suffix.substring(3,suffix.length-2);
         } else {
@@ -64,7 +65,7 @@ exports.startchess = {
 exports.acceptchess = {
     usage: "",
     describtion: "accept a challenge",
-    process: function(msg, suffix, bot) {
+    process: function(bot, msg, suffix) {
         var game = runningGames.find((el)=>(el.w == msg.author));
         if (typeof game == 'undefined') {
             msg.channel.sendMessage("You have not been challenged to play any game!");
@@ -92,7 +93,7 @@ exports.acceptchess = {
 exports.endchess = {
     usage: "",
     describtion: "give up a running game",
-    process: function (msg, suffix, bot) {
+    process: function (bot, msg, suffix) {
         var gamei = runningGames.findIndex((el)=>(el.channel = msg.channel && (el.b == msg.author || el.w == msg.author)));
         if (gamei != -1) {
             var game = runningGames[gamei];
@@ -108,7 +109,7 @@ exports.endchess = {
 exports.chess = {
     usage: "<from> <to> [promotion]",
     describtion: "move a piece and, if necessary, promote it (initial of piece to promote to)",
-    process: function (msg, suffix, bot, config) {
+    process: function (bot, msg, suffix, config) {
         var args = suffix.split(" ");
         if (args.length < 2) {
             msg.channel.sendMessage("insufficient arguments!\n**usage:** "+config.commandPrefix+"chess "+this.usage);
