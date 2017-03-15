@@ -33,7 +33,6 @@ exports.startchess = {
     describtion: "challenge a player to a new chess game",
     process: function(bot, msg, suffix, config) {
         var id;
-        console.log(suffix);
         if (suffix.length>4) {
             id = suffix.substring(3,suffix.length-1);
         } else {
@@ -45,15 +44,15 @@ exports.startchess = {
         }
 
         var game = runningGames.find((el)=>(el.b == msg.author || el.w == challengee));
-        if (typeof game == 'undefined') {
+        if (typeof game != 'undefined') {
             msg.channel.sendMessage("You or your challengee is already in a game in "+game.channel+"! End or finish it first");
-            return;
+            throw Error("Already in game");
         }
         var challenger = challengee;
         msg.channel.sendMessage(challenger+" Accept with `"+config.commandPrefix+"acceptchess` within 1 minute")
         .then((chall)=>{
             var game = new game(msg.channel, challengee, msg.author, chessTimeout);
-            runningGames.push();
+            runningGames.push(game);
             var chessTimeout = bot.setTimeout(()=>{
                 chall.edit(challenger+" Challenge expired!");
                 runningGames.splice(runningGames.findIndex((el)=>el.id==game.id), 1);
