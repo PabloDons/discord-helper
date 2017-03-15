@@ -1,4 +1,3 @@
-/* jshint esversion:6 */
 const cron = require('node-cron');
 const fs = require('fs');
 var crons;

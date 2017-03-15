@@ -1,4 +1,3 @@
-/* jshint esversion:6*/
 const Discord   = require('discord.js');
 const fs        = require('fs');
 const auth      = require('./auth.json');
@@ -83,7 +82,7 @@ bot.on('message', (msg) => {
 		if (msg.author.id == bot.user.id || perms.global[command] || (perms.users.hasOwnProperty(msg.author.id) && perms.users[msg.author.id][command])) {
 			if (commands.hasOwnProperty(command)) {
 				try {
-					commands[command].process(bot, msg, suffix);
+					commands[command].process(bot, msg, suffix, config);
 					console.log("command succeeded");
 				} catch(e) {
 					console.log("command "+suffix+" failed");
