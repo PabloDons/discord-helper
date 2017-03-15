@@ -36,11 +36,11 @@ exports.startchess = {
         if (suffix.length>4) {
             id = suffix.substring(3,suffix.length-2);
         } else {
-            return;
+            throw new Error("invalid argument");
         }
         var challengee;
         if (!(challengee = bot.users.get(id))) {
-            return;
+            throw new Error("User not found");
         }
 
         var game = runningGames.find((el)=>(el.b == msg.author || el.w == challengee));
