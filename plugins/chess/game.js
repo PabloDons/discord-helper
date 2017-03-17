@@ -8,9 +8,9 @@ exports.commands = [
 const spawn = require("child_process").spawn;
 const boardgen = spawn('python3', ['plugins/chess/boardgen/server.py']);
 boardgen.stdout.on('data', (chunk)=>{
-    var ch = boardgenqueue.shift();
-    ch.stopTyping();
-    ch.sendFile(chunk, "board.png");
+    var boardgen = boardgenqueue.shift();
+    boardgen.ch.stopTyping();
+    boardgen.ch.sendFile(chunk, "board.png", boardgen.msg);
 });
 boardgen.on('close', (code) => {
   console.log(`child process exited with code ${code}`);
@@ -126,21 +126,48 @@ exports.chess = {
         if (gamei != -1) {
             var game = runningGames[gamei];
             var move = game.chess.move({from: args[0], to: args[1]});
+            var boardgenparams = {
+                type:"png",
+                render:{
+                    fen: game.chess.fen().split(" ")[0]
+                }
+            };
             if (move === null) {
                 msg.channel.sendMessage("Illegal move!");
                 return;
+            } else {
+                boardgenparams.render.lastMove = args[0]+args[1];
             }
-            boardgen.stdin.write(JSON.stringify({
-                type:"png",
-                render:{
-                    fen: game.chess.fen().split(" ")[0],
-                    lastMove: move === null ? null : args[0]+args[1]
+            if (game.chess.in_check()) {
+                let le = "abcdefgh";
+                let breaking = false;
+                let king;
+                for (let q=0;q<64;q++) {
+                    let i=Math.floor(q/8)+1;
+                    let j=q%8;
+                    let square = le[j]+i.toString();
+                    let piece;
+                    piece = game.chess.get(square);
+                    if (piece === null) {
+                        continue;
+                    }
+                    if (piece.type == game.chess.KING && piece.color == game.chess.turn()) {
+                        king = square;
+                        break;
+                    }
                 }
-            })+"\n", undefined, ()=>{
-                msg.channel.startTyping();
-                boardgenqueue.push(msg.channel);
-                msg.channel.sendMessage(game[game.chess.turn()]+" Your move!\n**usage:** "+config.commandPrefix+"chess "+this.usage);
-            });
+                boardgenparams.render.check = king;
+            }
+            if (game.chess.game_over()) {
+                message = "The winner is "+game[game.chess.turn()=="w" ? "b" : "w"] + "!";
+                runningGames.splice(gamei, 1);
+            } else {
+                message = game[game.chess.turn()]+" Your move!";
+                message+= "\n**usage:** "+config.commandPrefix+"chess "+this.usage;
+            }
+            boardgenqueue.push({ch: msg.channel, msg: message});
+            msg.channel.startTyping();
+            boardgen.stdin.write(JSON.stringify(boardgenparams)+"\n");
         } else {
             msg.channel.sendMessage("You are not in a game!");
         }
