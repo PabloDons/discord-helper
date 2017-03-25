@@ -2,6 +2,12 @@ const Discord   = require('discord.js');
 const fs        = require('fs');
 const auth      = require('./auth.json');
 const path      = require('path');
+const readline = require('readline');
+var stdinrl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  terminal: false
+});
 
 var perms;
 try{
@@ -28,8 +34,14 @@ try{
 
 var commands = {
     "ping": {
+		usage:"",
+		description:"check response time",
         process:function(bot, msg, suffix) {
-            msg.channel.sendMessage("pong!");
+			var start = new Date();
+            msg.channel.sendMessage("pong!").then((m)=>{
+				var end = new Date();
+				m.edit("pong! | "+(end - start)+"ms");
+			});
         }
     },
     "eval": {
@@ -37,6 +49,12 @@ var commands = {
 		description: 'Executes arbitrary javascript in the bot process. User must have "eval" permission',
 		process: function(bot, msg, suffix) {
             console.log("evaluating "+suffix);
+			var result, start, end;
+			try {
+				result = eval(suffix);
+			} catch(e) {
+				result = e.name + ": " + e.message;
+			}
             var embed = {
                 color:0x00ff00,
                 fields:[
@@ -46,15 +64,21 @@ var commands = {
                     },
                     {
                         name:"Output",
-                        value:"```javascript\n"+eval(suffix)+"\n```"
+                        value:"```\n"+result+"\n```"
                     }
                 ],
                 timestamp: new Date()
             };
-            msg.edit("", {embed:embed});
+            msg.channel.sendEmbed(embed);
 		}
 	}
 };
+
+stdinrl.on('line', function(line){
+	commands.eval.process(bot, {channel:{sendEmbed:function(embed){
+        process.stdout.write(embed.fields[1].value.substring(4,embed.fields[1].value.length-3));
+    }}}, line);
+});
 
 function onExit() {
     console.log("exiting...");
@@ -62,6 +86,7 @@ function onExit() {
 }
 process.on('SIGINT', onExit);
 process.on('SIGTERM', onExit);
+
 
 
 function getDirectories(srcpath) {
@@ -76,11 +101,17 @@ var bot = new Discord.Client();
 var chatlogger = {};
 bot.on('message', (msg) => {
 	if (msg.content.substring(0, config.commandPrefix.length) == config.commandPrefix) {
-		console.log("treating "+msg.content+" as command...");
+		console.log(msg.author.username+": treating "+msg.content+" as command...");
 		var command = msg.content.split(" ")[0].substring(config.commandPrefix.length);
-		var suffix = msg.content.substr(config.commandPrefix.length+command.length+1);
 		if (msg.author.id == bot.user.id || perms.global[command] || (perms.users.hasOwnProperty(msg.author.id) && perms.users[msg.author.id][command])) {
-			if (commands.hasOwnProperty(command)) {
+			var suffix = msg.content.substr(config.commandPrefix.length+command.length+1);
+			if (command == "help") {
+				var help = [];
+				for (var cmd in commands) {
+					help.push("**"+config.commandPrefix+cmd+" "+commands[cmd].usage+"**:\n    "+commands[cmd].description);
+				}
+				msg.author.sendMessage(help.join("\n"), {split:true});
+			} else if (commands.hasOwnProperty(command)) {
 				try {
 					commands[command].process(bot, msg, suffix, config);
 					console.log("command succeeded");
