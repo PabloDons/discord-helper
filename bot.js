@@ -75,7 +75,9 @@ var commands = {
 };
 
 stdinrl.on('line', function(line){
-	commands.eval.process(bot, {channel:bot.channels.get("241382324741210113")}, line);
+	commands.eval.process(bot, {channel:{sendEmbed:function(embed){
+        process.stdout.write(embed.fields[1].value.substring(4,embed.fields[1].value.length-3));
+    }}}, line);
 });
 
 function onExit() {
