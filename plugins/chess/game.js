@@ -6,11 +6,11 @@ exports.commands = [
 ];
 
 const spawn = require("child_process").spawn;
-const boardgen = spawn('python3', ['plugins/chess/boardgen/server.py']);
+const boardgen = spawn('python', ['plugins/chess/boardgen/server.py']);
 boardgen.stdout.on('data', (chunk)=>{
-    var boardgen = boardgenqueue.shift();
-    boardgen.ch.stopTyping();
-    boardgen.ch.sendFile(chunk, "board.png", boardgen.msg);
+    var boardgenItem = boardgenqueue.shift();
+    boardgenItem.ch.stopTyping();
+    boardgenItem.ch.sendFile(chunk, "board.png", boardgenItem.msg);
 });
 boardgen.on('close', (code) => {
   console.log(`child process exited with code ${code}`);
@@ -90,8 +90,10 @@ exports.acceptchess = {
                 }
             })+"\n", undefined, ()=>{
                 msg.channel.startTyping();
-                boardgenqueue.push(msg.channel);
-                msg.channel.sendMessage(game[game.chess.turn()]+" Your move!\n**usage:** "+config.commandPrefix+"chess "+"<from> <to>");
+                boardgenqueue.push({
+                    ch:msg.channel,
+                    msg:game[game.chess.turn()]+" Your move!\n**usage:** "+config.commandPrefix+"chess "+"<from> <to>"
+                });
             });
         }
     }
