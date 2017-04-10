@@ -82,7 +82,7 @@ stdinrl.on('line', function(line){
 
 function onExit() {
     console.log("exiting...");
-    bot.destroy().then(process.exit());
+    bot.destroy().then(process.exit);
 }
 process.on('SIGINT', onExit);
 process.on('SIGTERM', onExit);
