@@ -1,7 +1,9 @@
 node_modules
-auth.json
 crons.json
 config.json
 permissions.json
+enabledplugins.json
 
+*auth.json
+*.log
 *.sh

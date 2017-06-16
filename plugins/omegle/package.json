@@ -1,0 +1,12 @@
+{
+    "name": "omegle",
+    "version": "1.0.0",
+    "description": "omegle x discord crosschat",
+    "main": "crosschat.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "PabloDons",
+    "license": "GPL-3.0",
+    "disabled": true
+}

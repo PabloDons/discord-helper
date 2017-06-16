@@ -15,6 +15,10 @@ boardgen.stdout.on('data', (chunk)=>{
 boardgen.on('close', (code) => {
   console.log(`child process exited with code ${code}`);
 });
+
+exports.shutdown = function() {
+    boardgen.kill();
+};
 var boardgenqueue = [];
 
 const Chess = require('chess.js').Chess;
@@ -54,10 +58,10 @@ exports.startchess = {
 
         var game = runningGames.find((el)=>(el.b == msg.author || el.w == challengee));
         if (typeof game != 'undefined') {
-            msg.channel.sendMessage("You or your challengee is already in a game in "+game.channel+"! End or finish it first");
+            msg.channel.send("You or your challengee is already in a game in "+game.channel+"! End or finish it first");
             throw Error("Already in game");
         }
-        msg.channel.sendMessage(challengee+" Accept with `"+config.commandPrefix+"acceptchess` within 1 minute")
+        msg.channel.send(challengee+" Accept with `"+config.commandPrefix+"acceptchess` within 1 minute")
         .then((chall)=>{
             var game = new Game(msg.channel, challengee, msg.author);
             game.acceptTimeout = bot.setTimeout(()=>{
@@ -75,13 +79,13 @@ exports.acceptchess = {
     process: function(bot, msg, suffix, config) {
         var game = runningGames.find(function(el) {return (el.w.id == msg.author.id);});
         if (typeof game == 'undefined') {
-            msg.channel.sendMessage("You have not been challenged to play any game!");
+            msg.channel.send("You have not been challenged to play any game!");
         } else if (!game.pending) {
-            msg.channel.sendMessage("You are already in a game in "+game.channel+"! End or finish it first");
+            msg.channel.send("You are already in a game in "+game.channel+"! End or finish it first");
         } else {
             game.pending = false;
             bot.clearTimeout(game.acceptTimeout);
-            msg.channel.sendMessage("Game started between "+game.w+" and "+game.b+"!");
+            msg.channel.send("Game started between "+game.w+" and "+game.b+"!");
 
             boardgen.stdin.write(JSON.stringify({
                 type:"png",
@@ -106,11 +110,11 @@ exports.endchess = {
         var gamei = runningGames.findIndex((el)=>(el.channel = msg.channel && (el.b == msg.author || el.w == msg.author)));
         if (gamei != -1) {
             var game = runningGames[gamei];
-            msg.channel.sendMessage("Game between "+game.w+" and "+game.b+" has ended with a fold!");
-            msg.channel.sendMessage("The winner is "+(game.b == msg.author ? game.w : game.b)+"!");
+            msg.channel.send("Game between "+game.w+" and "+game.b+" has ended with a fold!");
+            msg.channel.send("The winner is "+(game.b == msg.author ? game.w : game.b)+"!");
             runningGames.splice(gamei, 1);
         } else {
-            msg.channel.sendMessage("You are not in a game!");
+            msg.channel.send("You are not in a game!");
         }
     }
 };
@@ -121,7 +125,7 @@ exports.chess = {
     process: function (bot, msg, suffix, config) {
         var args = suffix.split(" ");
         if (args.length < 2) {
-            msg.channel.sendMessage("insufficient arguments!\n**usage:** "+config.commandPrefix+"chess "+this.usage);
+            msg.channel.send("insufficient arguments!\n**usage:** "+config.commandPrefix+"chess "+this.usage);
             throw new Error("argument error");
         }
         var gamei = runningGames.findIndex((el)=>(el.channel == msg.channel && (el.b == msg.author || el.w == msg.author)));
@@ -135,7 +139,7 @@ exports.chess = {
                 }
             };
             if (move === null) {
-                msg.channel.sendMessage("Illegal move!");
+                msg.channel.send("Illegal move!");
                 return;
             } else {
                 boardgenparams.render.lastMove = args[0]+args[1];
@@ -171,7 +175,7 @@ exports.chess = {
             msg.channel.startTyping();
             boardgen.stdin.write(JSON.stringify(boardgenparams)+"\n");
         } else {
-            msg.channel.sendMessage("You are not in a game!");
+            msg.channel.send("You are not in a game!");
         }
     }
 };
