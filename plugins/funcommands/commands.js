@@ -1,4 +1,4 @@
-
+const figlet = require('figlet');
 
 const EventEmitter = require('events');
 var logTarget = new EventEmitter();
@@ -19,20 +19,32 @@ var log = {
 
 exports.commands = [
     "purge",
-    "tristana"
+    "tristana",
+    "figlet"
 ];
+
 exports.shutdown = function() {
 
 };
+
 exports._prerun = function(bot) {
 
+};
+
+exports.figlet = {
+    usage: "<text>",
+    description: "turns text into graffiti art",
+    process: function(bot, msg, suffix, config) {
+        msg.delete();
+        msg.channel.send(figlet.textSync(suffix, "Graffiti"), {code:true});
+    }
 };
 
 exports.purge = {
     usage: "<channel>",
     description: "spams a channel without mercy",
     process: function(bot, msg, suffix, config) {
-        
+
     }
 };
 

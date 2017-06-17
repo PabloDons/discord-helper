@@ -12,6 +12,7 @@
     "chess.js": "^0.10.2",
     "child_process": "^1.0.2",
     "discord.js": "latest",
+    "figlet": "^1.2.0",
     "fs": "0.0.1-security",
     "later": "^1.2.0",
     "log": "^1.4.0",
